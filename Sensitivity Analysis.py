@@ -70,3 +70,49 @@ plt.legend()
 plt.grid(True)
 plt.tight_layout()
 plt.show()
+def runge_kutta1(t0, U0, y0, t_end, dt):
+    t_values = np.arange(t0, t_end, dt)
+    U_values = []
+    y_values = []
+
+    U = U0
+    y = y0
+
+    for t in t_values:
+        U_values.append(U)
+        y_values.append(y)
+
+        k1_U, k1_y = derivatives_chaos(t, U, y)
+        k2_U, k2_y = derivatives_chaos(t + 0.5*dt, U + 0.5*dt*k1_U, y + 0.5*dt*k1_y)
+        k3_U, k3_y = derivatives_chaos(t + 0.5*dt, U + 0.5*dt*k2_U, y + 0.5*dt*k2_y)
+        k4_U, k4_y = derivatives_chaos(t + dt, U + dt*k3_U, y + dt*k3_y)
+
+        U += (dt/6) * (k1_U + 2*k2_U + 2*k3_U + k4_U)
+        y += (dt/6) * (k1_y + 2*k2_y + 2*k3_y + k4_y)
+
+    return t_values, U_values, y_values
+
+fig=plt.figure(figsize=(12, 6))
+ax = fig.add_subplot(111, projection='3d')
+U0 =0.0
+y0 = 0.0
+t0 = 0.0
+t_end = 200.0
+dt = 0.01
+
+
+t_values, U_values, y_values = runge_kutta1(t0, U0, y0, t_end, dt)
+
+ax.plot(U_values, y_values, t_values, label=f'IC: U0={U0}, y0={y0}')
+# Labels and title
+ax.set_xlabel('y')
+ax.set_ylabel('U')
+ax.set_zlabel('time')
+ax.set_title('3D Phase Space Trajectories')
+ax.legend()
+plt.show()
+plt.plot(U_values,y_values)
+plt.xlabel('U')
+plt.ylabel('y')
+plt.grid(True)
+plt.show()
