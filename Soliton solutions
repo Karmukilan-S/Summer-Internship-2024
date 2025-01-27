@@ -1,0 +1,69 @@
+import numpy as np
+from scipy.special import ellipj
+import matplotlib.pyplot as plt
+
+# Define soliton functions
+def bright_soliton(x, t):
+    return np.sqrt(2*f2/f1) * np.cosh(np.sqrt(f2) * (lambda1*x - omega1*t))**-1
+
+def dark_soliton(x, t):
+    return np.sqrt(f2/f1) * np.tanh(np.sqrt(-0.5*f2) * (lambda1*x - omega1*t))
+
+def dn_sol(x, t, h):
+  term1 = f2 + np.sqrt(f2 ** 2 + 4 * h * f1)
+
+  term2 = f2 - np.sqrt(f2 ** 2 + 4 * h * f1)
+
+  if term1 < 0 :
+      raise ValueError("Invalid values for square root.")
+  sigma2h = np.sqrt(term1 / f1)
+  sigma1h = np.sqrt(abs(term2 / f1))
+  u = sigma2h * np.sqrt(0.5 * f1) * (lambda1 * x - omega1 * t)
+  m = np.sqrt(sigma2h ** 2 - sigma1h ** 2) / sigma2h
+  return sigma2h * ellipj(u, m)[2]
+
+def sn_sol(x, t, h):
+    sigma3h = np.sqrt((f2 - np.sqrt(f2**2 + 4*h*f1)) / f1)
+    sigma4h = np.sqrt((f2 + np.sqrt(f2**2 + 4*h*f1)) / f1)
+    u = sigma4h * np.sqrt(-0.5*f1) * (lambda1*x - omega1*t)
+    m = sigma3h / sigma4h
+    return sigma3h * ellipj(u, m)[0]  # ellipj returns sn, cn, dn, ph
+
+# Parameters
+x = np.linspace(-5, 5, 1000)
+t = np.linspace(0, 10, 1000)
+X, T = np.meshgrid(x, t)
+alpha = 1
+omega1 = 1
+omega2 = 1
+kappa1 = 1
+kappa2 = 2
+lambda1 = 1
+lambda2 = 2
+mew2 = 2
+f1 = 2 * alpha / ((kappa1)**2 + (lambda1)**2 - (omega1)**2)
+f2 = ((kappa2)**2 + (lambda2)**2 - (omega2)**2 + 2 * mew2) / ((kappa1)**2 + (lambda1)**2 - (omega1)**2)
+
+# Compute dn soliton
+U_bright_mod = dn_sol(X, T, 1)
+
+# Plotting the modulus of bright soliton surface
+fig = plt.figure(figsize=(14, 7))
+ax = fig.add_subplot(121, projection='3d')
+ax.plot_surface(X, T, U_bright_mod, cmap='viridis')
+ax.set_title('Modulus of Bright Soliton')
+ax.set_xlabel('x')
+ax.set_ylabel('t')
+ax.set_zlabel('|u(x,t)|')
+plt.tight_layout()
+plt.show()
+
+# Plot bright soliton at t=0
+u_bright_mod = dn_sol(x, 0,1)
+plt.figure(figsize=(12, 6))
+plt.plot(x, u_bright_mod, label='alpha=1.5')
+plt.plot(x, u_bright_mod, label='alpha=1')  # Typo corrected from u_broight_mod to u_bright_mod
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
