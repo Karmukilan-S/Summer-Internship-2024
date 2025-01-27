@@ -1,0 +1,61 @@
+import numpy as np
+from scipy.integrate import solve_ivp
+import matplotlib.pyplot as plt
+
+
+u=np.linspace(3,-3,40)
+y=np.linspace(3,-3,40)
+U,Y=np.meshgrid(u,y)
+V=Y
+Z=-f1*U**3+f2*U
+magnitude=np.sqrt(Z**2+V**2)
+plt.figure(figsize=(10, 10))
+Z = Z / magnitude
+V = V / magnitude
+plt.quiver(U,Y,V,Z, magnitude, scale=30, cmap='viridis', linewidth=0.5)
+plt.colorbar()
+plt.show()
+
+F1=2
+F2=4.25
+def system(t, state, F1, F2):
+    U, y = state
+    dU_dt = y
+    dy_dt = -F1 * U**3 + F2 * U
+    return [dU_dt, dy_dt]
+
+
+
+# Vector field grid
+U, y = np.meshgrid(np.linspace(-3, 3, 20), np.linspace(-3, 3, 20))
+dU_dt = y
+dy_dt = -f1 * U**3 + f2 * U
+
+# Normalize the vector field for better visualization
+magnitude = np.sqrt(dU_dt**2 + dy_dt**2)
+dU_dt /= magnitude
+dy_dt /= magnitude
+
+# Stream plot
+plt.figure(figsize=(10, 8))
+
+
+# Initial conditions for streamlines
+initial_conditions = [(-0.15, -0.15), (-1.5, 1.5), (0.03, -0.05), (1.5, 1.5), (0, 0.5), (-1.4, 0),[2,2.5]]
+
+# Integrate the system of equations and plot streamlines
+for U0, y0 in initial_conditions:
+    sol = solve_ivp(system, [0, 20], [U0, y0], args=(f1, f2), dense_output=True)
+    t = np.linspace(0, 2, 900)
+    U_t, y_t = sol.sol(t)
+    plt.plot(U_t, y_t, label=f'IC: U0={U0}, y0={y0}')
+
+# Labels and title
+plt.xlabel('U')
+plt.ylabel('y')
+plt.title('Phase Flow')
+#plt.xlim(-3, 3)
+#plt.ylim(-3, 3)
+plt.legend()
+plt.grid(True)
+plt.show()
